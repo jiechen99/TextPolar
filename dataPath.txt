@@ -1,0 +1,5 @@
+1号机：
+/data1/chenj/dataset/[SynthText_gt_dir, ctw_train1000, ...]
+
+2号机：
+/home/chenj/dataset/[SynthText_gt_dir, ctw_train1000, ...]

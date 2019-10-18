@@ -1,0 +1,1 @@
+python2 eval.py --test_data_path=/media/icstcscl/data-950G/dataset/icdar2015_test/  --gpu_list=0 --checkpoint_path=/media/icstcscl/data-950G/EAST/models/center0.15_border_cbam_rotate0.2_synthText/ --output_dir=/media/icstcscl/data-950G/EAST/output/center0.15_border/
