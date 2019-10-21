@@ -506,6 +506,12 @@ def generator(input_size=512, batch_size=32,
                     im_padded = np.zeros((max_h_w_i, max_h_w_i, 3), dtype=np.uint8)
                     im_padded[:new_h, :new_w, :] = im.copy()
                     im = cv2.resize(im_padded, dsize=(input_size, input_size))
+
+                    # 旋转图片
+                    if np.random.rand() < 0.5:
+                        angle = np.random.randint(1, 4)
+                        im_bg = np.rot90(im_bg, angle)
+
                     score_map = np.zeros((input_size, input_size), dtype=np.uint8)
                     sc_weight_map = np.ones((input_size, input_size), dtype=np.float32)
                     #border_map = np.zeros((input_size, input_size), dtype=np.uint8)
@@ -514,9 +520,9 @@ def generator(input_size=512, batch_size=32,
                     training_mask = np.ones((input_size, input_size), dtype=np.uint8)
                     skeleton_map = np.zeros((input_size, input_size), dtype=np.uint8)
                     sk_weight_map = np.ones((input_size, input_size), dtype=np.float32)
-                    if np.random.rand() < 0.5:
-                        angle = np.random.randint(1, 4)
-                        im = np.rot90(im, angle)
+                    # if np.random.rand() < 0.5:
+                    #     angle = np.random.randint(1, 4)
+                    #     im = np.rot90(im, angle)
                 else:
                     im, text_polys, text_tags = crop_area(im, text_polys, text_tags, crop_background=False)
                     if text_polys.shape[0] == 0:
@@ -539,15 +545,31 @@ def generator(input_size=512, batch_size=32,
                     text_polys[:, :, 0] *= resize_ratio_3_x
                     text_polys[:, :, 1] *= resize_ratio_3_y
                     new_h, new_w, _ = im.shape
-                    score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map = generate_rbox((new_h, new_w), text_polys, text_tags)
+
+                    # 旋转图片和标注信息
                     if np.random.rand() < 0.5:
                         angle = np.random.randint(1, 4)
                         im = np.rot90(im, angle)
-                        score_map = np.rot90(score_map, angle)
-                        sc_weight_map = np.rot90(sc_weight_map, angle)
-                        training_mask = np.rot90(training_mask, angle)
-                        skeleton_map = np.rot90(skeleton_map, angle)
-                        sk_weight_map = np.rot90(sk_weight_map, angle)
+                        text_polys_temp = text_polys.copy()
+                        if angle == 1:
+                            text_polys[:, :, 0] = text_polys_temp[:, :, 1]
+                            text_polys[:, :, 1] = new_w - text_polys_temp[:, :, 0]        
+                        elif angle == 2:
+                            text_polys[:, :, 0] = new_w - text_polys_temp[:, :, 0]
+                            text_polys[:, :, 1] = new_h - text_polys_temp[:, :, 1]
+                        else:
+                            text_polys[:, :, 0] = new_h - text_polys_temp[:, :, 1]
+                            text_polys[:, :, 1] = text_polys_temp[:, :, 0]
+                    
+                    score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map = generate_rbox((new_h, new_w), text_polys, text_tags)
+                    # if np.random.rand() < 0.5:
+                    #     angle = np.random.randint(1, 4)
+                    #     im = np.rot90(im, angle)
+                    #     score_map = np.rot90(score_map, angle)
+                    #     sc_weight_map = np.rot90(sc_weight_map, angle)
+                    #     training_mask = np.rot90(training_mask, angle)
+                    #     skeleton_map = np.rot90(skeleton_map, angle)
+                    #     sk_weight_map = np.rot90(sk_weight_map, angle)
 
                 img = Image.fromarray(cv2.cvtColor(im, cv2.COLOR_BGR2RGB))
                 img_pil = randomColor(img, 0)
