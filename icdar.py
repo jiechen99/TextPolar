@@ -381,14 +381,27 @@ def generator(input_size=512, batch_size=32,
 
                 text_polys, text_tags = load_annoataion(txt_fn)
 
+                # added by YCIrving
+                # 这里需要一次减1操作，因为标注信息是相对像素点而言的，从1开始
+                # 图像转换为矩阵，从0开始编号
+                text_polys -= 1
+
                 #text_polys, text_tags = check_and_validate_polys(text_polys, text_tags, (h, w))
                 # if text_polys.shape[0] == 0:
                 #     continue
                 # random scale this image
                 rd_scale = np.random.choice(random_scale)
                 im = cv2.resize(im, dsize=None, fx=rd_scale, fy=rd_scale)
-                text_polys *= rd_scale
+
+                # text_polys *= rd_scale
+
+                # added by YCIrving
+                # 这里需要下取整，如果scale=0.5，则对于在边界上的像素点，如果其坐标为奇数
+                # 则变换后取round会越界(crop_area函数中的np.round())                
+                text_polys = np.floor(text_polys * rd_scale)
+                
                 # print rd_scale
+
                 # random crop a area from image
                 if np.random.rand() < background_ratio:
                     # crop background
