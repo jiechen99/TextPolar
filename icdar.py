@@ -591,6 +591,7 @@ def generator(input_size=512, batch_size=32,
         score_maps = []
         sc_weight_maps = []
         #geo_maps = []
+        dir_distance_maps = []
         training_masks = []
         #border_maps = []
         skeleton_maps = []
@@ -646,7 +647,7 @@ def generator(input_size=512, batch_size=32,
                     # 旋转图片
                     if np.random.rand() < 0.5:
                         angle = np.random.randint(1, 4)
-                        im_bg = np.rot90(im_bg, angle)
+                        im = np.rot90(im, angle)
 
                     score_map = np.zeros((input_size, input_size), dtype=np.uint8)
                     sc_weight_map = np.ones((input_size, input_size), dtype=np.float32)
@@ -656,9 +657,10 @@ def generator(input_size=512, batch_size=32,
                     training_mask = np.ones((input_size, input_size), dtype=np.uint8)
                     skeleton_map = np.zeros((input_size, input_size), dtype=np.uint8)
                     sk_weight_map = np.ones((input_size, input_size), dtype=np.float32)
-                    # if np.random.rand() < 0.5:
-                    #     angle = np.random.randint(1, 4)
-                    #     im = np.rot90(im, angle)
+                    dir_distance_map = np.zeros((input_size, input_size, 8), dtype=np.float32)
+                    #if np.random.rand() < 0.5:
+                    #    angle = np.random.randint(1, 4)
+                    #    im = np.rot90(im, angle)
                 else:
                     im, text_polys, text_tags = crop_area(im, text_polys, text_tags, crop_background=False)
                     if text_polys.shape[0] == 0:
@@ -726,8 +728,9 @@ def generator(input_size=512, batch_size=32,
                 training_masks.append(training_mask[::, ::, np.newaxis].astype(np.float32))
                 skeleton_maps.append(skeleton_map[::, ::, np.newaxis].astype(np.float32))
                 sk_weight_maps.append(sk_weight_map[::, ::, np.newaxis].astype(np.float32))
+                dir_distance_maps.append(dir_distance_map[::, ::, np.newaxis].astype(np.float32))
                 if len(images) == batch_size:
-                    yield images, image_fns, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps
+                    yield images, image_fns, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, dir_distance_maps
                     images = []
                     image_fns = []
                     score_maps = []
@@ -735,6 +738,7 @@ def generator(input_size=512, batch_size=32,
                     training_masks = []
                     skeleton_maps = []
                     sk_weight_maps = []
+                    dir_distance_maps = []
             except Exception as e:
                 import traceback
                 traceback.print_exc()

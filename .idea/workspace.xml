@@ -2,57 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d161ae37-95f0-486d-ba36-dafec81a9e27" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/demo_images/img_10.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/demo_images/img_14.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/demo_images/img_2.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/demo_images/img_26.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/demo_images/img_75.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/demo_images/web-demo.png" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/deploy.sh" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/eval.py" afterPath="$PROJECT_DIR$/eval.py" />
       <change beforePath="$PROJECT_DIR$/icdar.py" afterPath="$PROJECT_DIR$/icdar.py" />
-      <change beforePath="$PROJECT_DIR$/lanms/.gitignore" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/.ycm_extra_conf.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/Makefile" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/__init__.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/__main__.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/adaptor.cpp" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/clipper/clipper.cpp" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/clipper/clipper.hpp" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/attr.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/buffer_info.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/cast.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/chrono.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/class_support.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/common.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/complex.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/descr.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/eigen.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/embed.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/eval.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/functional.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/numpy.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/operators.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/options.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/pybind11.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/pytypes.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/stl.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/stl_bind.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/include/pybind11/typeid.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lanms/lanms.h" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/locality_aware_nms.py" afterPath="" />
       <change beforePath="$PROJECT_DIR$/model.py" afterPath="$PROJECT_DIR$/model.py" />
       <change beforePath="$PROJECT_DIR$/multigpu_train.py" afterPath="$PROJECT_DIR$/multigpu_train.py" />
-      <change beforePath="$PROJECT_DIR$/readme.md" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/run_demo_server.py" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/static/css/app.css" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/training_samples/img_1.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/training_samples/img_1.txt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/training_samples/img_2.jpg" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/training_samples/img_2.txt" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -66,31 +18,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="icdar.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="icdar.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/icdar.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="428">
-              <caret line="300" column="75" lean-forward="true" selection-start-line="300" selection-start-column="75" selection-end-line="300" selection-end-column="75" />
+            <state relative-caret-position="4477">
+              <caret line="546" column="0" lean-forward="true" selection-start-line="546" selection-start-column="0" selection-end-line="546" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="vgg.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nets/vgg.py">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2398">
-              <caret line="132" column="4" lean-forward="false" selection-start-line="132" selection-start-column="4" selection-end-line="132" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="data_util.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data_util.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="528">
-              <caret line="27" column="8" lean-forward="false" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
+            <state relative-caret-position="-2027">
+              <caret line="173" column="33" lean-forward="false" selection-start-line="173" selection-start-column="33" selection-end-line="173" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -99,28 +41,8 @@
       <file leaf-file-name="multigpu_train.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/multigpu_train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="148" column="35" lean-forward="false" selection-start-line="148" selection-start-column="35" selection-end-line="148" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="eval.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/eval.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="22">
-              <caret line="45" column="7" lean-forward="false" selection-start-line="45" selection-start-column="7" selection-end-line="45" selection-end-column="7" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/model.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-523">
-              <caret line="183" column="0" lean-forward="false" selection-start-line="183" selection-start-column="0" selection-end-line="183" selection-end-column="0" />
+            <state relative-caret-position="409">
+              <caret line="31" column="25" lean-forward="false" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -156,8 +78,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/multigpu_train.py" />
         <option value="$PROJECT_DIR$/eval.py" />
+        <option value="$PROJECT_DIR$/multigpu_train.py" />
         <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/icdar.py" />
       </list>
@@ -169,11 +91,11 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="51" />
-    <option name="y" value="156" />
-    <option name="width" value="1615" />
-    <option name="height" value="1026" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="39" />
+    <option name="y" value="23" />
+    <option name="width" value="1401" />
+    <option name="height" value="877" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -190,19 +112,19 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="EAST_skeleton_ctw" type="b2602c69:ProjectViewProjectNode" />
-              <item name="EAST_skeleton_ctw" type="462c0819:PsiDirectoryNode" />
+              <item name="PolarText" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PolarText" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -239,7 +161,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="51" y="156" width="1615" height="1026" extended-state="1" />
+    <frame x="39" y="23" width="1401" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -249,7 +171,7 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.10773994" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13024282" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -595,7 +517,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/nets/vgg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2398">
+        <state relative-caret-position="19">
           <caret line="132" column="4" lean-forward="false" selection-start-line="132" selection-start-column="4" selection-end-line="132" selection-end-column="4" />
           <folding />
         </state>
@@ -603,16 +525,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_util.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
+        <state relative-caret-position="456">
           <caret line="27" column="8" lean-forward="false" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/multigpu_train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="148" column="35" lean-forward="false" selection-start-line="148" selection-start-column="35" selection-end-line="148" selection-end-column="35" />
           <folding />
         </state>
       </provider>
@@ -625,18 +539,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/model.py">
+    <entry file="file://$PROJECT_DIR$/icdar.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-523">
-          <caret line="183" column="0" lean-forward="false" selection-start-line="183" selection-start-column="0" selection-end-line="183" selection-end-column="0" />
+        <state relative-caret-position="4477">
+          <caret line="546" column="0" lean-forward="true" selection-start-line="546" selection-start-column="0" selection-end-line="546" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/icdar.py">
+    <entry file="file://$PROJECT_DIR$/multigpu_train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
-          <caret line="300" column="75" lean-forward="true" selection-start-line="300" selection-start-column="75" selection-end-line="300" selection-end-column="75" />
+        <state relative-caret-position="409">
+          <caret line="31" column="25" lean-forward="false" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2027">
+          <caret line="173" column="33" lean-forward="false" selection-start-line="173" selection-start-column="33" selection-end-line="173" selection-end-column="33" />
           <folding />
         </state>
       </provider>

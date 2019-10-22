@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.contrib import slim
 from tensorflow.python.ops import array_ops
 
-tf.app.flags.DEFINE_integer('text_scale', 512, '')
+tf.app.flags.DEFINE_integer('text_scale', 768, '')
 
 from nets import resnet_v1
 from nets import vgg
@@ -171,6 +171,7 @@ def model(images, weight_decay=1e-5, is_training=True):
             # F_score = unpool(F_score)
             # F_score = unpool(F_score)
             SK_score = slim.conv2d(g[4], 1, 1, activation_fn=tf.nn.sigmoid, normalizer_fn=None)
+            dir_map = slim.conv2d(g[4], 8, 1, activation_fn=tf.nn.sigmoid, normalizer_fn=None) * FLAGS.text_scale
             # F_score, B_score = tf.split(value=FB_score, num_or_size_splits=2, axis=3)
             # B_score = unpool(B_score)
             # B_score = unpool(B_score)
@@ -179,7 +180,7 @@ def model(images, weight_decay=1e-5, is_training=True):
             # angle_map = (slim.conv2d(g[3], 1, 1, activation_fn=tf.nn.sigmoid, normalizer_fn=None) - 0.5) * np.pi/2 # angle is between [-45, 45]
             # F_geometry = tf.concat([geo_map, angle_map], axis=-1)
 
-    return F_score, SK_score
+    return F_score, SK_score, dir_map
 
 
 def dice_coefficient(y_true_cls, y_pred_cls, weight_map,
@@ -285,7 +286,7 @@ def dice_coefficient_OHNM(y_true_cls, y_pred_cls, weight_map,
 
 
 def loss(y_true_cls, sc_weight, y_pred_cls,
-         training_mask, y_true_skeleton, sk_weight, y_pred_skeleton):
+         training_mask, y_true_skeleton, sk_weight, y_pred_skeleton, dir_distance_cls, dir_pred_distance):
     '''
     define the loss used for training, contraning two part,
     the first part we use dice loss instead of weighted logloss,

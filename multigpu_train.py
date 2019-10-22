@@ -24,13 +24,13 @@ FLAGS = tf.app.flags.FLAGS
 gpus = list(range(len(FLAGS.gpu_list.split(','))))
 
 
-def tower_loss(images, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, reuse_variables=None):
+def tower_loss(images, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, dir_distance_maps, reuse_variables=None):
     # Build inference graph
     with tf.variable_scope(tf.get_variable_scope(), reuse=reuse_variables):
-        f_score, sk_score = model.model(images, is_training=True)
+        f_score, sk_score, dir_scores = model.model(images, is_training=True)
 
     model_loss = model.loss(score_maps, sc_weight_maps, f_score,
-                            training_masks, skeleton_maps, sk_weight_maps, sk_score)
+                            training_masks, skeleton_maps, sk_weight_maps, sk_score, dir_distance_maps, dir_scores)
     total_loss = tf.add_n([model_loss] + tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
 
     # add summary
@@ -39,6 +39,8 @@ def tower_loss(images, score_maps, sc_weight_maps, training_masks, skeleton_maps
         tf.summary.image('score_map', score_maps)
         tf.summary.image('sc_weight_map', sc_weight_maps)
         tf.summary.image('score_map_pred', f_score * 255)
+        tf.summary.image('dir_maps_0', dir_distance_maps[:, :, :, 0:1])
+        tf.summary.image('dir_maps_0_pred', dir_scores[:, :, :, 0:1])
         tf.summary.image('training_masks', training_masks)
         tf.summary.scalar('model_loss', model_loss)
         tf.summary.scalar('total_loss', total_loss)
@@ -82,6 +84,7 @@ def main(argv=None):
     input_training_masks = tf.placeholder(tf.float32, shape=[None, None, None, 1], name='input_training_masks')
     input_skeleton_maps = tf.placeholder(tf.float32, shape=[None, None, None, 1], name='input_skeleton_maps')
     input_sk_weight_maps = tf.placeholder(tf.float32, shape=[None, None, None, 1], name='input_sk_weight_maps')
+    input_dir_distance_maps = tf.placeholder(tf.float32, shape=[None, None, None, 8], name='input_dir_distance_maps')
     global_step = tf.get_variable('global_step', [], initializer=tf.constant_initializer(0), trainable=False)
     learning_rate = tf.train.exponential_decay(FLAGS.learning_rate, global_step, decay_steps=10000, decay_rate=0.94, staircase=True)
     # add summary
@@ -97,6 +100,7 @@ def main(argv=None):
     input_training_masks_split = tf.split(input_training_masks, len(gpus))
     input_skeleton_maps_split = tf.split(input_skeleton_maps, len(gpus))
     input_sk_weight_maps_split = tf.split(input_sk_weight_maps, len(gpus))
+    input_dir_distance_maps_split = tf.split(input_dir_distance_maps, len(gpus))
 
     tower_grads = []
     reuse_variables = None
@@ -109,7 +113,8 @@ def main(argv=None):
                 itms = input_training_masks_split[i]
                 iskms = input_skeleton_maps_split[i]
                 iskwms = input_sk_weight_maps_split[i]
-                total_loss, model_loss = tower_loss(iis, isms, iswms, itms, iskms, iskwms, reuse_variables)
+                iddms = input_dir_distance_maps_split[i]
+                total_loss, model_loss = tower_loss(iis, isms, iswms, itms, iskms, iskwms, iddms, reuse_variables)
                 batch_norm_updates_op = tf.group(*tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope))
                 reuse_variables = True
 
@@ -158,7 +163,8 @@ def main(argv=None):
                                                                                 input_sc_weight_maps: data[3],
                                                                                 input_training_masks: data[4],
                                                                                 input_skeleton_maps: data[5],
-                                                                                input_sk_weight_maps: data[6]})
+                                                                                input_sk_weight_maps: data[6],
+                                                                                input_dir_distance_maps: data[7]})
             if np.isnan(tl):
                 print('Loss diverged, stop training')
                 break
@@ -179,7 +185,8 @@ def main(argv=None):
                                                                                              input_sc_weight_maps: data[3],
                                                                                              input_training_masks: data[4],
                                                                                              input_skeleton_maps: data[5],
-                                                                                             input_sk_weight_maps: data[6]})
+                                                                                             input_sk_weight_maps: data[6],
+                                                                                             input_dir_distance_maps: data[7]})
                 summary_writer.add_summary(summary_str, global_step=step)
 
 if __name__ == '__main__':
