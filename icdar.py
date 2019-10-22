@@ -373,15 +373,15 @@ def getMiddlePoints(centerPoint_list, connectPoint_list):
     thickness = max(int(np.linalg.norm(middlePoints[0] - middlePoints[-1]) / 4), 3)
     return skeletonLine, thickness, middlePoints
 
-def getDirDistanceMap(score_map, outline_map):
+def getDirDistanceMap(inside_pixel_map, outline_map):
     # 暴力搜索，如果太慢还要考虑优化算法
-    h,w = score_map.shape
+    h,w = inside_pixel_map.shape
     max_h_w = np.max([h, w])
     sqrt2 = np.sqrt(2)
     # 增加方向距离图
     dir_distance_map = np.ones((8,h,w), dtype = np.float32)
     # dir_distance_map *= 255
-    score_pixels = np.argwhere(score_map==1)
+    score_pixels = np.argwhere(inside_pixel_map==1)
     for pixel in score_pixels:
         r,c = pixel
         error_tag = False
@@ -545,12 +545,14 @@ def generate_rbox(im_size, polys, tags):
     sc_weight_map *= (score_weighted_map == 0)
     sc_weight_map += score_weighted_map
 
+    # 更新skeleton_map
+    skeleton_map = np.logical_and(skeleton_map, score_map)
     # 增加轮廓图，以便后期计算各个方向上的距离
     outline_map = np.zeros((h, w), dtype = np.uint8)
     # lineType需设置为4，防止遗漏端点
     cv2.polylines(outline_map, polys.astype(np.int32), isClosed=True, color=1, thickness=1, lineType=4)
     # dir_distance_map: 8*h*w，表示8个方向上的像素距离，未归一化
-    dir_distance_map = getDirDistanceMap(score_map, outline_map)
+    dir_distance_map = getDirDistanceMap(skeleton_map, outline_map)
     return score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map
 
 def randomColor(image, model = 0):
