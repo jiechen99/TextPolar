@@ -697,7 +697,7 @@ def generator(input_size=512, batch_size=32,
                             text_polys[:, :, 0] = new_h - text_polys_temp[:, :, 1]
                             text_polys[:, :, 1] = text_polys_temp[:, :, 0]
                     
-                    score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map = generate_rbox((new_h, new_w), text_polys, text_tags)
+                    score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map = generate_rbox((new_h, new_w), text_polys, text_tags)
                     # if np.random.rand() < 0.5:
                     #     angle = np.random.randint(1, 4)
                     #     im = np.rot90(im, angle)
