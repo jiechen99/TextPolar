@@ -168,6 +168,9 @@ def crop_area(im, polys, tags, crop_background=False, max_tries=500):
             if np.any(poly_axis_in_area):
                 continue
             else:
+                # 注意：这里如果包围框很大，标注点会很分散
+                # 会出现即使采样的图片中不包含任何标注点，但依然有文字存在于图片中的情况
+                # 一种改进可能是使用所有边界点来判断，但这样效率会降低很多
                 return im[ymin:ymax+1, xmin:xmax+1, :], np.array([]), np.array([])
     else:
         # 防止无法取到边界
@@ -370,6 +373,127 @@ def getMiddlePoints(centerPoint_list, connectPoint_list):
     thickness = max(int(np.linalg.norm(middlePoints[0] - middlePoints[-1]) / 4), 3)
     return skeletonLine, thickness, middlePoints
 
+def getDirDistanceMap(score_map, outline_map):
+    # 暴力搜索，如果太慢还要考虑优化算法
+    h,w = score_map.shape
+    max_h_w = np.max([h, w])
+    sqrt2 = np.sqrt(2)
+    # 增加方向距离图
+    dir_distance_map = np.ones((8,h,w), dtype = np.float32)
+    # dir_distance_map *= 255
+    score_pixels = np.argwhere(score_map==1)
+    for pixel in score_pixels:
+        r,c = pixel
+        error_tag = False
+        # 如果是边界本身的像素点
+        if outline_map[r, c] == 1:
+            dir_distance_map[:, r, c] = 0
+        else:
+            # up
+            for i in range(1,h):
+                if r-i<0:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 0!")
+                    error_tag = True
+                    break
+                if outline_map[r-i, c] == 1:
+                    dir_distance_map[0, r, c] = i
+                    break
+            if error_tag:
+                continue
+                
+            # up-right
+            for i in range(1,max_h_w):
+                if r-i<0 or c+i>w-1:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 1!")
+                    error_tag = True
+                    break
+                if outline_map[r-i, c+i] == 1:
+                    dir_distance_map[1, r, c] = i*sqrt2
+                    break
+            if error_tag:
+                continue
+                
+            # right
+            for i in range(1,w):
+                if c+i>w-1:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 2!")
+                    error_tag = True
+                    break
+                if outline_map[r, c+i] == 1:
+                    dir_distance_map[2, r, c] = i
+                    break
+            if error_tag:
+                continue
+                
+            # down-right
+            for i in range(1,max_h_w):
+                if r+i>h-1 or c+i>w-1:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 3!")
+                    error_tag = True
+                    break                
+                if outline_map[r+i, c+i] == 1:
+                    dir_distance_map[3, r, c] = i*sqrt2
+                    break
+            if error_tag:
+                continue
+                
+            # down
+            for i in range(1,h):
+                if r+i>h-1:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 4!")
+                    error_tag = True
+                    break
+                if outline_map[r+i, c] == 1:
+                    dir_distance_map[4, r, c] = i
+                    break
+            if error_tag:
+                continue
+                
+            # down-left
+            for i in range(1,max_h_w):
+                if r+i>h-1 or c-i<0:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 5!")
+                    error_tag = True
+                    break                
+                if outline_map[r+i, c-i] == 1:
+                    dir_distance_map[5, r, c] = i*sqrt2
+                    break
+            if error_tag:
+                continue
+                
+            # left
+            for i in range(1,w):
+                if c-i<0:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 6!")
+                    error_tag = True
+                    break
+                if outline_map[r, c-i] == 1:
+                    dir_distance_map[6, r, c] = i
+                    break
+            if error_tag:
+                continue
+                
+            # up-left
+            for i in range(1,max_h_w):
+                if r-i<0 or c-i<0:
+                    dir_distance_map[:, r, c] = -1
+                    print("Error while calculating direction distance map 7!")
+                    error_tag = True
+                    break                
+                if outline_map[r-i, c-i] == 1:
+                    dir_distance_map[7, r, c] = i*sqrt2
+                    break
+            if error_tag:
+                continue
+    return dir_distance_map
+
 def generate_rbox(im_size, polys, tags):
     h, w = im_size
     score_map = np.zeros((h, w), dtype=np.uint8)
@@ -389,14 +513,17 @@ def generate_rbox(im_size, polys, tags):
         skeletonLine, thickness, middlePoints = getMiddlePoints(centerPoint_list, connectPoint_list)
         shrinked_poly = np.array(middlePoints, np.int32)[np.newaxis, :, :]
         skeletonLine_list = np.array(skeletonLine, np.int32)[np.newaxis, :, :]
-        cv2.fillPoly(score_map, poly.astype(np.int32)[np.newaxis, :, :], 1)
+        # lineType需设置为4，与outline_map保持一致        
+        cv2.fillPoly(score_map, poly.astype(np.int32)[np.newaxis, :, :], 1, lineType=4)
         cv2.polylines(skeleton_map, skeletonLine_list, False, 1, thickness)
         if tag:
-            cv2.fillPoly(training_mask, poly.astype(np.int32)[np.newaxis, :, :], 0)
+            # lineType需设置为4，与outline_map保持一致  
+            cv2.fillPoly(training_mask, poly.astype(np.int32)[np.newaxis, :, :], 0, lineType=4)
 
         pos_score_mask = np.zeros((h, w), dtype=np.uint8)
         pos_skeleton_mask = np.zeros((h, w), dtype=np.uint8)
-        cv2.fillPoly(pos_score_mask, shrinked_poly, 1)
+        # lineType需设置为4，与outline_map保持一致
+        cv2.fillPoly(pos_score_mask, shrinked_poly, 1, lineType=4)
         cv2.polylines(pos_skeleton_mask, skeletonLine_list, False, 1, thickness)
         pos_score_masks.append(pos_score_mask)
         pos_skeleton_masks.append(pos_skeleton_mask)
@@ -417,7 +544,14 @@ def generate_rbox(im_size, polys, tags):
     sc_weight_map = np.ones((h, w), dtype=np.float32)
     sc_weight_map *= (score_weighted_map == 0)
     sc_weight_map += score_weighted_map
-    return score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map
+
+    # 增加轮廓图，以便后期计算各个方向上的距离
+    outline_map = np.zeros((h, w), dtype = np.uint8)
+    # lineType需设置为4，防止遗漏端点
+    cv2.polylines(outline_map, polys.astype(np.int32), isClosed=True, color=1, thickness=1, lineType=4)
+    # dir_distance_map: 8*h*w，表示8个方向上的像素距离，未归一化
+    dir_distance_map = getDirDistanceMap(score_map, outline_map)
+    return score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map
 
 def randomColor(image, model = 0):
     if model == 0: # 饱亮对锐
