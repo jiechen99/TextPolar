@@ -27,10 +27,10 @@ gpus = list(range(len(FLAGS.gpu_list.split(','))))
 def tower_loss(images, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, dir_distance_maps, reuse_variables=None):
     # Build inference graph
     with tf.variable_scope(tf.get_variable_scope(), reuse=reuse_variables):
-        f_score, sk_score, dir_scores = model.model(images, is_training=True)
+        f_score, sk_score, dir_map = model.model(images, is_training=True)
 
     model_loss = model.loss(score_maps, sc_weight_maps, f_score,
-                            training_masks, skeleton_maps, sk_weight_maps, sk_score, dir_distance_maps, dir_scores)
+                            training_masks, skeleton_maps, sk_weight_maps, sk_score, dir_distance_maps, dir_map)
     total_loss = tf.add_n([model_loss] + tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
 
     # add summary

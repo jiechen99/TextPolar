@@ -379,7 +379,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
     max_h_w = np.max([h, w])
     sqrt2 = np.sqrt(2)
     # 增加方向距离图
-    dir_distance_map = np.ones((8,h,w), dtype = np.float32)
+    dir_distance_map = np.ones((h,w,8), dtype = np.float32)
     # dir_distance_map *= 255
     score_pixels = np.argwhere(inside_pixel_map==1)
     for pixel in score_pixels:
@@ -387,17 +387,17 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
         error_tag = False
         # 如果是边界本身的像素点
         if outline_map[r, c] == 1:
-            dir_distance_map[:, r, c] = 0
+            dir_distance_map[r, c, :] = 0
         else:
             # up
             for i in range(1,h):
                 if r-i<0:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 0!")
                     error_tag = True
                     break
                 if outline_map[r-i, c] == 1:
-                    dir_distance_map[0, r, c] = i
+                    dir_distance_map[r, c, 0] = i
                     break
             if error_tag:
                 continue
@@ -405,12 +405,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # up-right
             for i in range(1,max_h_w):
                 if r-i<0 or c+i>w-1:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 1!")
                     error_tag = True
                     break
                 if outline_map[r-i, c+i] == 1:
-                    dir_distance_map[1, r, c] = i*sqrt2
+                    dir_distance_map[r, c, 1] = i*sqrt2
                     break
             if error_tag:
                 continue
@@ -418,12 +418,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # right
             for i in range(1,w):
                 if c+i>w-1:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 2!")
                     error_tag = True
                     break
                 if outline_map[r, c+i] == 1:
-                    dir_distance_map[2, r, c] = i
+                    dir_distance_map[r, c, 2] = i
                     break
             if error_tag:
                 continue
@@ -431,12 +431,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # down-right
             for i in range(1,max_h_w):
                 if r+i>h-1 or c+i>w-1:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 3!")
                     error_tag = True
                     break                
                 if outline_map[r+i, c+i] == 1:
-                    dir_distance_map[3, r, c] = i*sqrt2
+                    dir_distance_map[r, c, 3] = i*sqrt2
                     break
             if error_tag:
                 continue
@@ -444,12 +444,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # down
             for i in range(1,h):
                 if r+i>h-1:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 4!")
                     error_tag = True
                     break
                 if outline_map[r+i, c] == 1:
-                    dir_distance_map[4, r, c] = i
+                    dir_distance_map[r, c, 4] = i
                     break
             if error_tag:
                 continue
@@ -457,12 +457,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # down-left
             for i in range(1,max_h_w):
                 if r+i>h-1 or c-i<0:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 5!")
                     error_tag = True
                     break                
                 if outline_map[r+i, c-i] == 1:
-                    dir_distance_map[5, r, c] = i*sqrt2
+                    dir_distance_map[r, c, 5] = i*sqrt2
                     break
             if error_tag:
                 continue
@@ -470,12 +470,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # left
             for i in range(1,w):
                 if c-i<0:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 6!")
                     error_tag = True
                     break
                 if outline_map[r, c-i] == 1:
-                    dir_distance_map[6, r, c] = i
+                    dir_distance_map[r, c, 6] = i
                     break
             if error_tag:
                 continue
@@ -483,12 +483,12 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
             # up-left
             for i in range(1,max_h_w):
                 if r-i<0 or c-i<0:
-                    dir_distance_map[:, r, c] = -1
+                    dir_distance_map[r, c, :] = -1
                     print("Error while calculating direction distance map 7!")
                     error_tag = True
                     break                
                 if outline_map[r-i, c-i] == 1:
-                    dir_distance_map[7, r, c] = i*sqrt2
+                    dir_distance_map[r, c, 7] = i*sqrt2
                     break
             if error_tag:
                 continue

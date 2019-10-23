@@ -182,6 +182,34 @@ def model(images, weight_decay=1e-5, is_training=True):
 
     return F_score, SK_score, dir_map
 
+def smooth_L1_loss(dir_distance_maps, dir_distance_maps_pred, y_true_skeleton, 
+                   training_mask, channel_weight=[1., 1., 1., 1., 1., 1., 1., 1.], delta = 1.0):
+
+    '''
+    smooth l1 loss
+    :param dir_distance_maps: batch_size*h*w*direction_number
+    :param dir_distance_maps_pred: batch_size*h*w*direction_number
+    :param y_true_skeleton: batch_size*h*w*1
+    :param training_mask: batch_size*h*w*1
+    :param channel_weight: list with direction_number elements
+    :return: smoothL1_loss: tf.float
+    '''
+
+    direction_number = dir_distance_maps.shape[-1].value # default 8
+    channel_weight = tf.constant(channel_weight, shape=[1,1,1,direction_number])
+    bool_mask = tf.tile(tf.cast((y_true_skeleton*training_mask)>0, dtype = tf.bool), multiples=[1,1,1,direction_number])
+    
+    map_diff = (dir_distance_maps_pred - dir_distance_maps) * y_true_skeleton * training_mask
+    abs_map_diff = tf.abs(map_diff)
+    smoothL1_sign = tf.cast(abs_map_diff < (1 / delta), dtype = tf.float32)
+
+    smoothL1_loss_map = tf.pow(map_diff, 2) * (delta / 2.) * smoothL1_sign \
+                  + (abs_map_diff - (0.5 / delta)) * (1. - smoothL1_sign)
+
+    smoothL1_loss_map_weighted = smoothL1_loss_map*channel_weight
+
+    smoothL1_loss = tf.reduce_mean(tf.boolean_mask(smoothL1_loss_map_weighted, bool_mask))
+    return smoothL1_loss
 
 def dice_coefficient(y_true_cls, y_pred_cls, weight_map,
                      training_mask, type):
@@ -286,7 +314,7 @@ def dice_coefficient_OHNM(y_true_cls, y_pred_cls, weight_map,
 
 
 def loss(y_true_cls, sc_weight, y_pred_cls,
-         training_mask, y_true_skeleton, sk_weight, y_pred_skeleton, dir_distance_cls, dir_pred_distance):
+         training_mask, y_true_skeleton, sk_weight, y_pred_skeleton, dir_distance_maps, dir_distance_maps_pred):
     '''
     define the loss used for training, contraning two part,
     the first part we use dice loss instead of weighted logloss,
@@ -306,4 +334,6 @@ def loss(y_true_cls, sc_weight, y_pred_cls,
     skeleton_loss = dice_coefficient(y_true_skeleton, y_pred_skeleton, sk_weight, training_mask, 'skeleton')
     #classification_loss = dice_coefficient_OHNM(y_true_cls, y_pred_cls, sc_weight, training_mask, 'classification')
     #skeleton_loss = dice_coefficient_OHNM(y_true_skeleton, y_pred_skeleton, sk_weight, training_mask, 'skeleton')
+
+    dir_distance_loss = smooth_l1_loss(dir_distance_maps, dir_distance_maps_pred, y_true_skeleton, training_mask)
     return skeleton_loss + classification_loss
