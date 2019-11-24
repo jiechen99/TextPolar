@@ -731,7 +731,7 @@ def generator(input_size=512, batch_size=32,
                 training_masks.append(training_mask[::, ::, np.newaxis].astype(np.float32))
                 skeleton_maps.append(skeleton_map[::, ::, np.newaxis].astype(np.float32))
                 sk_weight_maps.append(sk_weight_map[::, ::, np.newaxis].astype(np.float32))
-                dir_distance_maps.append(dir_distance_map[::, ::, np.newaxis].astype(np.float32))
+                dir_distance_maps.append(dir_distance_map.astype(np.float32))
                 if len(images) == batch_size:
                     yield images, image_fns, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, dir_distance_maps
                     images = []

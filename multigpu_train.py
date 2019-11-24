@@ -29,7 +29,7 @@ def tower_loss(images, score_maps, sc_weight_maps, training_masks, skeleton_maps
     with tf.variable_scope(tf.get_variable_scope(), reuse=reuse_variables):
         f_score, sk_score, dir_map = model.model(images, is_training=True)
 
-    model_loss = model.loss(score_maps, sc_weight_maps, f_score,
+    model_loss, sk_loss, cls_loss, dir_loss = model.loss(score_maps, sc_weight_maps, f_score,
                             training_masks, skeleton_maps, sk_weight_maps, sk_score, dir_distance_maps, dir_map)
     total_loss = tf.add_n([model_loss] + tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
 
@@ -47,7 +47,7 @@ def tower_loss(images, score_maps, sc_weight_maps, training_masks, skeleton_maps
         tf.summary.image('skeleton_map', skeleton_maps)
         tf.summary.image('sk_weight_map', sk_weight_maps)
 
-    return total_loss, model_loss
+    return total_loss, model_loss, sk_loss, cls_loss, dir_loss
 
 
 def average_gradients(tower_grads):
@@ -114,7 +114,7 @@ def main(argv=None):
                 iskms = input_skeleton_maps_split[i]
                 iskwms = input_sk_weight_maps_split[i]
                 iddms = input_dir_distance_maps_split[i]
-                total_loss, model_loss = tower_loss(iis, isms, iswms, itms, iskms, iskwms, iddms, reuse_variables)
+                total_loss, model_loss, sk_loss, cls_loss, dir_loss = tower_loss(iis, isms, iswms, itms, iskms, iskwms, iddms, reuse_variables)
                 batch_norm_updates_op = tf.group(*tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope))
                 reuse_variables = True
 
@@ -158,7 +158,7 @@ def main(argv=None):
         start = time.time()
         for step in range(FLAGS.max_steps):
             data = next(data_generator)
-            ml, tl, _ = sess.run([model_loss, total_loss, train_op], feed_dict={input_images: data[0],
+            ml, tl, sl, cl, dl, _ = sess.run([model_loss, total_loss, sk_loss, cls_loss, dir_loss, train_op], feed_dict={input_images: data[0],
                                                                                 input_score_maps: data[2],
                                                                                 input_sc_weight_maps: data[3],
                                                                                 input_training_masks: data[4],
@@ -173,8 +173,9 @@ def main(argv=None):
                 avg_time_per_step = (time.time() - start)/10
                 avg_examples_per_second = (10 * FLAGS.batch_size_per_gpu * len(gpus))/(time.time() - start)
                 start = time.time()
-                print('Step {:06d}, model loss {:.4f}, total loss {:.4f}, {:.2f} seconds/step, {:.2f} examples/second'.format(
-                    step, ml, tl, avg_time_per_step, avg_examples_per_second))
+                print('Step {:06d}, model loss {:.4f}, total loss {:.4f}, skeleton loss {:.4f}, textRegion_loss {:.4f}, dir_loss {:.4f},'
+                      ' {:.2f} seconds/step, {:.2f} examples/second'.format(
+                    step, ml, tl, sl, cl, dl, avg_time_per_step, avg_examples_per_second))
 
             if step % FLAGS.save_checkpoint_steps == 0:
                 saver.save(sess, FLAGS.checkpoint_path + 'model.ckpt', global_step=global_step)

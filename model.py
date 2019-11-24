@@ -334,6 +334,5 @@ def loss(y_true_cls, sc_weight, y_pred_cls,
     skeleton_loss = dice_coefficient(y_true_skeleton, y_pred_skeleton, sk_weight, training_mask, 'skeleton')
     #classification_loss = dice_coefficient_OHNM(y_true_cls, y_pred_cls, sc_weight, training_mask, 'classification')
     #skeleton_loss = dice_coefficient_OHNM(y_true_skeleton, y_pred_skeleton, sk_weight, training_mask, 'skeleton')
-
-    dir_distance_loss = smooth_l1_loss(dir_distance_maps, dir_distance_maps_pred, y_true_skeleton, training_mask)
-    return skeleton_loss + classification_loss
+    dir_distance_loss = smooth_L1_loss(dir_distance_maps, dir_distance_maps_pred, y_true_skeleton, training_mask)
+    return skeleton_loss + classification_loss + dir_distance_loss, skeleton_loss, classification_loss, dir_distance_loss
