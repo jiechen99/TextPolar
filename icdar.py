@@ -612,7 +612,10 @@ def generator(input_size=512, batch_size=32,
                 # added by YCIrving
                 # 这里需要一次减1操作，因为标注信息是相对像素点而言的，从1开始
                 # 图像转换为矩阵，从0开始编号
-                text_polys -= 1
+                
+                # updated by YCIrving at 191124
+                # 发现标注信息中有0存在，因此这里不需要-=1
+                # text_polys -= 1
 
                 #text_polys, text_tags = check_and_validate_polys(text_polys, text_tags, (h, w))
                 # if text_polys.shape[0] == 0:
@@ -691,12 +694,12 @@ def generator(input_size=512, batch_size=32,
                         text_polys_temp = text_polys.copy()
                         if angle == 1:
                             text_polys[:, :, 0] = text_polys_temp[:, :, 1]
-                            text_polys[:, :, 1] = new_w - text_polys_temp[:, :, 0]        
+                            text_polys[:, :, 1] = new_w - text_polys_temp[:, :, 0]-1
                         elif angle == 2:
-                            text_polys[:, :, 0] = new_w - text_polys_temp[:, :, 0]
-                            text_polys[:, :, 1] = new_h - text_polys_temp[:, :, 1]
+                            text_polys[:, :, 0] = new_w - text_polys_temp[:, :, 0]-1
+                            text_polys[:, :, 1] = new_h - text_polys_temp[:, :, 1]-1
                         else:
-                            text_polys[:, :, 0] = new_h - text_polys_temp[:, :, 1]
+                            text_polys[:, :, 0] = new_h - text_polys_temp[:, :, 1]-1
                             text_polys[:, :, 1] = text_polys_temp[:, :, 0]
                     
                     score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map = generate_rbox((new_h, new_w), text_polys, text_tags)
