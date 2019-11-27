@@ -373,11 +373,13 @@ def getMiddlePoints(centerPoint_list, connectPoint_list):
     thickness = max(int(np.linalg.norm(middlePoints[0] - middlePoints[-1]) / 4), 3)
     return skeletonLine, thickness, middlePoints
 
-def getDirDistanceMap(inside_pixel_map, outline_map):
+def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
+    # alpha和beta表示偏移参数，dis_new = (dis-alpha)*beta
     # 暴力搜索，如果太慢还要考虑优化算法
     h,w = inside_pixel_map.shape
     max_h_w = np.max([h, w])
     sqrt2 = np.sqrt(2)
+    diag_line = np.sqrt(np.power(h,2)+np.power(w,2))
     # 增加方向距离图
     dir_distance_map = np.ones((h,w,8), dtype = np.float32)
     # dir_distance_map *= 255
@@ -397,7 +399,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break
                 if outline_map[r-i, c] == 1:
-                    dir_distance_map[r, c, 0] = i
+                    dir_distance_map[r, c, 0] = ((i/h)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -410,7 +412,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break
                 if outline_map[r-i, c+i] == 1:
-                    dir_distance_map[r, c, 1] = i*sqrt2
+                    dir_distance_map[r, c, 1] = ((i*sqrt2/diag_line)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -423,7 +425,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break
                 if outline_map[r, c+i] == 1:
-                    dir_distance_map[r, c, 2] = i
+                    dir_distance_map[r, c, 2] = ((i/w)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -436,7 +438,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break                
                 if outline_map[r+i, c+i] == 1:
-                    dir_distance_map[r, c, 3] = i*sqrt2
+                    dir_distance_map[r, c, 3] = ((i*sqrt2/diag_line)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -449,7 +451,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break
                 if outline_map[r+i, c] == 1:
-                    dir_distance_map[r, c, 4] = i
+                    dir_distance_map[r, c, 4] = ((i/h)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -462,7 +464,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break                
                 if outline_map[r+i, c-i] == 1:
-                    dir_distance_map[r, c, 5] = i*sqrt2
+                    dir_distance_map[r, c, 5] = ((i*sqrt2/diag_line)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -475,7 +477,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break
                 if outline_map[r, c-i] == 1:
-                    dir_distance_map[r, c, 6] = i
+                    dir_distance_map[r, c, 6] = ((i/w)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -488,7 +490,7 @@ def getDirDistanceMap(inside_pixel_map, outline_map):
                     error_tag = True
                     break                
                 if outline_map[r-i, c-i] == 1:
-                    dir_distance_map[r, c, 7] = i*sqrt2
+                    dir_distance_map[r, c, 7] = ((i*sqrt2/diag_line)-alpha)*beta
                     break
             if error_tag:
                 continue
@@ -552,7 +554,8 @@ def generate_rbox(im_size, polys, tags):
     # lineType需设置为4，防止遗漏端点
     cv2.polylines(outline_map, polys.astype(np.int32), isClosed=True, color=1, thickness=1, lineType=4)
     # dir_distance_map: 8*h*w，表示8个方向上的像素距离，未归一化
-    dir_distance_map = getDirDistanceMap(skeleton_map, outline_map)
+    # alpha和beta表示偏移参数，dis_new = (dis-alpha)*beta
+    dir_distance_map = getDirDistanceMap(skeleton_map, outline_map, alpha=0.5, beta=3)
     return score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map
 
 def randomColor(image, model = 0):
