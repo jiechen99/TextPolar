@@ -399,7 +399,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break
                 if outline_map[r-i, c] == 1:
-                    dir_distance_map[r, c, 0] = ((i/h)-alpha)*beta
+                    # dir_distance_map[r, c, 0] = ((i/h)-alpha)*beta
+                    dir_distance_map[r, c, 0] = i
                     break
             if error_tag:
                 continue
@@ -412,7 +413,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break
                 if outline_map[r-i, c+i] == 1:
-                    dir_distance_map[r, c, 1] = ((i*sqrt2/diag_line)-alpha)*beta
+                    # dir_distance_map[r, c, 1] = ((i*sqrt2/diag_line)-alpha)*beta
+                    dir_distance_map[r, c, 1] = i * sqrt2
                     break
             if error_tag:
                 continue
@@ -425,7 +427,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break
                 if outline_map[r, c+i] == 1:
-                    dir_distance_map[r, c, 2] = ((i/w)-alpha)*beta
+                    # dir_distance_map[r, c, 2] = ((i/w)-alpha)*beta
+                    dir_distance_map[r, c, 2] = i
                     break
             if error_tag:
                 continue
@@ -438,7 +441,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break                
                 if outline_map[r+i, c+i] == 1:
-                    dir_distance_map[r, c, 3] = ((i*sqrt2/diag_line)-alpha)*beta
+                    # dir_distance_map[r, c, 3] = ((i*sqrt2/diag_line)-alpha)*beta
+                    dir_distance_map[r, c, 3] = i * sqrt2
                     break
             if error_tag:
                 continue
@@ -451,7 +455,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break
                 if outline_map[r+i, c] == 1:
-                    dir_distance_map[r, c, 4] = ((i/h)-alpha)*beta
+                    # dir_distance_map[r, c, 4] = ((i/h)-alpha)*beta
+                    dir_distance_map[r, c, 4] = i
                     break
             if error_tag:
                 continue
@@ -464,7 +469,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break                
                 if outline_map[r+i, c-i] == 1:
-                    dir_distance_map[r, c, 5] = ((i*sqrt2/diag_line)-alpha)*beta
+                    # dir_distance_map[r, c, 5] = ((i*sqrt2/diag_line)-alpha)*beta
+                    dir_distance_map[r, c, 5] = i * sqrt2
                     break
             if error_tag:
                 continue
@@ -477,7 +483,8 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break
                 if outline_map[r, c-i] == 1:
-                    dir_distance_map[r, c, 6] = ((i/w)-alpha)*beta
+                    # dir_distance_map[r, c, 6] = ((i/w)-alpha)*beta
+                    dir_distance_map[r, c, 6] = i
                     break
             if error_tag:
                 continue
@@ -490,11 +497,30 @@ def getDirDistanceMap(inside_pixel_map, outline_map, alpha=0.5, beta=3):
                     error_tag = True
                     break                
                 if outline_map[r-i, c-i] == 1:
-                    dir_distance_map[r, c, 7] = ((i*sqrt2/diag_line)-alpha)*beta
+                    # dir_distance_map[r, c, 7] = ((i*sqrt2/diag_line)-alpha)*beta
+                    dir_distance_map[r, c, 7] = i * sqrt2
                     break
             if error_tag:
                 continue
     return dir_distance_map
+
+def getNormalizationMap(im_size, poly, skeleton_map, skeletonLine_list, thickness):
+    h, w = im_size
+    normalization_map_temp = np.ones((h, w), dtype=np.float32)
+    skeleton_map_temp = np.zeros((h, w), dtype = np.uint8)
+    max_width = poly[:,0].max() - poly[:,0].min()
+    max_height = poly[:,1].max() - poly[:,1].min()
+    # get the normalization factor
+    normalization_factor = 2.0/np.minimum(max_width, max_height);
+    cv2.polylines(skeleton_map_temp, skeletonLine_list, False, 1, thickness)
+    # calculate the intersection
+    skeleton_intersection = np.logical_and(skeleton_map, skeleton_map_temp)
+    # remove the intersection from skeleton_map_temp
+    skeleton_map_temp = skeleton_map_temp - skeleton_intersection
+    normalization_map_temp = normalization_map_temp * normalization_factor
+    normalization_map_temp = normalization_map_temp * skeleton_map_temp
+    return normalization_map_temp
+
 
 def generate_rbox(im_size, polys, tags):
     h, w = im_size
@@ -503,6 +529,7 @@ def generate_rbox(im_size, polys, tags):
     skeleton_map = np.zeros((h, w), dtype=np.uint8)
     skeleton_weighted_map = np.zeros((h, w), dtype=np.float32)
     training_mask = np.ones((h, w), dtype=np.uint8)
+    normalization_map = np.zeros((h, w), dtype=np.float32)    
     pos_score_masks = []
     pos_skeleton_masks = []
     pos_bbox_num = 0
@@ -515,6 +542,10 @@ def generate_rbox(im_size, polys, tags):
         skeletonLine, thickness, middlePoints = getMiddlePoints(centerPoint_list, connectPoint_list)
         shrinked_poly = np.array(middlePoints, np.int32)[np.newaxis, :, :]
         skeletonLine_list = np.array(skeletonLine, np.int32)[np.newaxis, :, :]
+        # 计算normalization_map
+        normalization_map_temp = getNormalizationMap(im_size, poly, skeleton_map, skeletonLine_list, thickness)
+        # we calculate and remove intersection, in order to avoid adding the factor twice
+        normalization_map = normalization_map + normalization_map_temp        
         # lineType需设置为4，与outline_map保持一致        
         cv2.fillPoly(score_map, poly.astype(np.int32)[np.newaxis, :, :], 1, lineType=4)
         cv2.polylines(skeleton_map, skeletonLine_list, False, 1, thickness)
@@ -549,6 +580,8 @@ def generate_rbox(im_size, polys, tags):
 
     # 更新skeleton_map
     skeleton_map = np.logical_and(skeleton_map, score_map)
+    # 更新normalization_map
+    normalization_map = normalization_map * score_map    
     # 增加轮廓图，以便后期计算各个方向上的距离
     outline_map = np.zeros((h, w), dtype = np.uint8)
     # lineType需设置为4，防止遗漏端点
@@ -556,7 +589,7 @@ def generate_rbox(im_size, polys, tags):
     # dir_distance_map: 8*h*w，表示8个方向上的像素距离，未归一化
     # alpha和beta表示偏移参数，dis_new = (dis-alpha)*beta
     dir_distance_map = getDirDistanceMap(skeleton_map, outline_map, alpha=0.5, beta=3)
-    return score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map
+    return score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map, normalization_map
 
 def randomColor(image, model = 0):
     if model == 0: # 饱亮对锐
@@ -594,6 +627,7 @@ def generator(input_size=512, batch_size=32,
         score_maps = []
         sc_weight_maps = []
         #geo_maps = []
+        normalization_maps = []
         dir_distance_maps = []
         training_masks = []
         #border_maps = []
@@ -664,6 +698,7 @@ def generator(input_size=512, batch_size=32,
                     skeleton_map = np.zeros((input_size, input_size), dtype=np.uint8)
                     sk_weight_map = np.ones((input_size, input_size), dtype=np.float32)
                     dir_distance_map = np.zeros((input_size, input_size, 8), dtype=np.float32)
+                    normalization_map = np.zeros((input_size, input_size, 8), dtype=np.float32)
                     #if np.random.rand() < 0.5:
                     #    angle = np.random.randint(1, 4)
                     #    im = np.rot90(im, angle)
@@ -705,7 +740,7 @@ def generator(input_size=512, batch_size=32,
                             text_polys[:, :, 0] = new_h - text_polys_temp[:, :, 1]-1
                             text_polys[:, :, 1] = text_polys_temp[:, :, 0]
                     
-                    score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map = generate_rbox((new_h, new_w), text_polys, text_tags)
+                    score_map, sc_weight_map, training_mask, skeleton_map, sk_weight_map, dir_distance_map, normalization_map = generate_rbox((new_h, new_w), text_polys, text_tags)
                     # if np.random.rand() < 0.5:
                     #     angle = np.random.randint(1, 4)
                     #     im = np.rot90(im, angle)
@@ -734,9 +769,10 @@ def generator(input_size=512, batch_size=32,
                 training_masks.append(training_mask[::, ::, np.newaxis].astype(np.float32))
                 skeleton_maps.append(skeleton_map[::, ::, np.newaxis].astype(np.float32))
                 sk_weight_maps.append(sk_weight_map[::, ::, np.newaxis].astype(np.float32))
+                normalization_maps.append(normalization_map[::, ::, np.newaxis].astype(np.float32))
                 dir_distance_maps.append(dir_distance_map.astype(np.float32))
                 if len(images) == batch_size:
-                    yield images, image_fns, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, dir_distance_maps
+                    yield images, image_fns, score_maps, sc_weight_maps, training_masks, skeleton_maps, sk_weight_maps, dir_distance_maps, normalization_maps
                     images = []
                     image_fns = []
                     score_maps = []
@@ -745,6 +781,7 @@ def generator(input_size=512, batch_size=32,
                     skeleton_maps = []
                     sk_weight_maps = []
                     dir_distance_maps = []
+                    normalization_maps = []
             except Exception as e:
                 import traceback
                 traceback.print_exc()
