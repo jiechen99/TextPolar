@@ -250,8 +250,6 @@ def getOutputPolyPoints(samplePoints, borderPoints, pointsDis, map_h, map_w, rat
     p3 = samplePoints[-1]
     intersectionP1 = getIntersectionPoint(p1,p0,map_w,map_h)
     intersectionP2 = getIntersectionPoint(p2,p3,map_w,map_h) 
-    if intersectionP1 == intersectionP2:
-        return []
     polyArea = getPolyArea(intersectionP1, intersectionP2, map_h, map_w, samplePoints)
     polyAreaArray = np.asarray(polyArea)
     canvas = np.zeros((map_h, map_w),dtype = np.uint8)
