@@ -152,40 +152,45 @@ def drawContour(skeleton, selectedPoints, dir_maps):
 
 def getIntersectionPoint(p_s,p_e,map_w,map_h):
     intersection_points = []
+    intersection_points_temp = []
     x_s = p_s[1]
     y_s = p_s[0]
     x_e = p_e[1]
     y_e = p_e[0]
     if x_s==x_e:
-        intersection_points = [[x_s,0], [x_s,map_h]]
+        intersection_points_temp = [[x_s,0], [x_s,map_h]]
     elif y_s==y_e:
-        intersection_points = [[0,y_s], [map_w,y_s]]
+        intersection_points_temp = [[0,y_s], [map_w,y_s]]
     else:
         # left border: x = 0
         x_left = 0
         y_left = (y_s-y_e)/(x_e-x_s)*x_s + y_s
         if y_left >= 0 and y_left <= map_h:
-            intersection_points.append([x_left, y_left])
+            intersection_points_temp.append([x_left, y_left])
             
         # up border: y = 0
         y_up = 0
         x_up = (x_s - x_e)/(y_e - y_s)*y_s + x_s
         if x_up >=0 and x_up <= map_w:
-            intersection_points.append([x_up, y_up])
+            intersection_points_temp.append([x_up, y_up])
             
         # right border: x = map_w
         x_right = map_w
         y_right = (y_e - y_s) / (x_e - x_s)*(map_w - x_s) + y_s
         if y_right >= 0 and y_right <= map_h:
-            intersection_points.append([x_right, y_right])
+            intersection_points_temp.append([x_right, y_right])
             
         # down dorder: y = map_h
         y_down = map_h
         x_down = (x_e - x_s)/(y_e - y_s)*(map_h - y_s) + x_s
         if x_down >=0 and x_down <= map_w:
-            intersection_points.append([x_down, y_down])        
-        
+            intersection_points_temp.append([x_down, y_down])        
+    
+    for p in intersection_points_temp:
+        if not p in intersection_points:
+            intersection_points.append(p)
     assert len(intersection_points) == 2
+    
     intersection_point = []
     for p in intersection_points:
         dis_s = (p[0]-x_s)*(p[0]-x_s) + (p[1]-y_s)*(p[1]-y_s)
