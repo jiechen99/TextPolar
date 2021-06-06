@@ -4,4 +4,4 @@
  3. multi_train.py (parameter setting)
  4. eval.py (inference && post processing)
  5. train.sh && eval.sh (command line)
- 6. test
+ 
